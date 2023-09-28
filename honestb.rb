@@ -53,7 +53,7 @@ class HonestB
     def eval_primitive()
       # selfの内容を評価結果で上書きする(メモ化)
       lhs = @arg1
-      rhs = @arg2
+      rhs = @arg2.drop_i1
       @arg1 = @arg2 = nil
     case lhs.type
       when :FALSE
@@ -116,7 +116,7 @@ class HonestB
       when :NUM
         raise "invalid output format (attempted to apply a number): #{lhs.inspect} #{rhs.inspect}"
       else
-        raise "invalid appliation form: fun=#{lhs.inspect} arg=#{rhs.inspect}"
+        raise ScriptError.new("unexpected state: lhs=#{lhs.inspect} rhs=#{rhs.inspect}")
       end
     end
 
@@ -165,6 +165,7 @@ class HonestB
   def readc(i)
     while i >= @input_buf.size && !@input_isEOF
       begin
+        flush_output
         @input_buf += @stdin.readline.bytes
       rescue EOFError
         @input_isEOF = true
