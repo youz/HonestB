@@ -43,10 +43,9 @@ class TestHonestB < Minitest::Test
     n1 = HonestB::Expr.new(:NUM, 1)
     n2 = HonestB::Expr.new(:NUM, 2)
     n3 = HonestB::Expr.new(:NUM, 3)
-    app = ->(a,b){ HonestB::Expr.new(:A, a, b) }
-    assert_equal 1, app[app[k, n1], n2].eval.to_i
-    assert_equal 2, app[app[app[app[k, k], n1], n2], n3].eval.to_i
-    assert_equal 1, app[app[app[s, k], k], n1].eval.to_i
+    assert_equal 1, k.apply(n1).apply(n2).eval.to_i
+    assert_equal 2, k.apply(k).apply(n1).apply(n2).apply(n3).eval.to_i
+    assert_equal 1, s.apply(k).apply(k).apply(n1).eval.to_i
   end
 
   def test_list
