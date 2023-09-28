@@ -24,7 +24,7 @@ Iコンビネータ ``` i = ``skk ``` をHonest Bに変換した時に`クイッ
 したかった為この順番になっています。
 
 `スロー`、`クイック`、`❤`以外の文字列は無視して読み飛ばします。
-`❤`は`❤️`のように異字体セレクタ(U+FE0E or U+FE0F)が付いていても問題ありません。
+❤は❤️のように異字体セレクタ(U+FE0E or U+FE0F)が付いていても問題ありません。
 
 ## 入出力
 
@@ -48,7 +48,7 @@ Honest BプログラムはLazy Kと同様に "入力文字列を引数に取っ�
 
 1. [Lazy Kリファレンス実装パッケージ (lazy-k.zip)](https://sange.fi/esoteric/essie2/download/)に含まれているScheme -> Lazy Kコンパイラ **lazier.scm** を入手する
     - [Gauche](https://practical-scheme.net/gauche/index-j.html) v0.9.12 で動作する事を確認済み
-2. 上記パッケージ内のegフォルダにあるサンプルやこのリポジトリのSchemeコードを参考にしながらSchemeプログラムを書く
+2. Lazy Kパッケージ内のegフォルダにあるサンプルやこのリポジトリのSchemeコードを参考にしながらSchemeプログラムを書く
     - 最終出力は `print-as-unlambda` 関数を使ってUnlambdaスタイルで出力する
 3. 2.のSchemeプログラムを実行し、出力結果をこのリポジトリの [lazyk2hb.rb](./lazyk2hb.rb) でコンパイルする
 
