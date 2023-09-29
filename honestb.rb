@@ -13,6 +13,13 @@ class HonestB
       @arg2 = a2
     end
 
+    S = Expr.new(:S)
+    K = Expr.new(:K)
+    I = Expr.new(:I)
+    FALSE = Expr.new(:FALSE)
+    INC = Expr.new(:INC)
+    NUM0 = Expr.new(:NUM, 0)
+
     def drop_i1
       if @type == :I1
         cur = @arg1
@@ -87,7 +94,7 @@ class HonestB
         # lhsも(cons ch readnext) = \b. b ch readnext となるよう書き換えておく
         # S(SI(K c))(K r) = \b.(SI(K c)b)(K r b) = \b.(I b (K c b)) r = \b. b c r
         lhs.type = :S2
-        lhs.arg1 = Expr.new(:S2, Expr.new(:I), Expr.new(:K1, ch))
+        lhs.arg1 = Expr.new(:S2, Expr::I, Expr.new(:K1, ch))
         lhs.arg2 = Expr.new(:K1, readnext)
       when :CN
         @type = :CN1
@@ -150,17 +157,12 @@ class HonestB
     @input_isEOF = false
 
     @cnums = (0..256).map{|i| Expr.new(:CN, i) }
-    @S = Expr.new(:S)
-    @K = Expr.new(:K)
-    @FALSE = Expr.new(:FALSE)
-    @INC = Expr.new(:INC)
-    @NUM0 = Expr.new(:NUM, 0)
   end
 
   private
-  def car(e) = e.apply(@K)
-  def cdr(e) = e.apply(@FALSE)
-  def cn2i(e) = e.apply(@INC).apply(@NUM0).eval.to_i
+  def car(e) = e.apply(Expr::K)
+  def cdr(e) = e.apply(Expr::FALSE)
+  def cn2i(e) = e.apply(Expr::INC).apply(Expr::NUM0).eval.to_i
 
   def readc(i)
     while i >= @input_buf.size && !@input_isEOF
@@ -216,8 +218,8 @@ class HonestB
       line += 1
       l.scan(/スロー|クイック|\u2764/).each{|tk|
         case tk
-        when "スロー" then stack << Expr.new(:S)
-        when "クイック" then stack << Expr.new(:K)
+        when "スロー" then stack << Expr::S
+        when "クイック" then stack << Expr::K
         when "\u2764" then
           if stack.size < 2
             raise SyntaxError.new("line #{line}: unexpected \u2764")
@@ -237,7 +239,10 @@ class HonestB
   def ast2expr(e)
     case e
     in [f, a] then ast2expr(f).apply(ast2expr(a))
-    else Expr.new(e)
+    in :S then Expr::S
+    in :K then Expr::K
+    in :I then Expr::I
+    else raise "unknown expr: #{e}"
     end
   end
 
