@@ -31,10 +31,11 @@ class TestHonestB < Minitest::Test
     assert_equal 1, cn2i(ast2expr([[:S, :K], :K]))
 
     cn2 = [[:S, [[:S, [:K, :S]], :K]], :I] # ``s``s`kski
+    cn3 = [[:S, [[:S, [:K, :S]], :K]], [[:S, [[:S, [:K, :S]], :K]], :I]]
     assert_equal 2, cn2i(ast2expr(cn2))
-    assert_equal 4, cn2i(ast2expr([cn2, cn2]))
-    assert_equal 16, cn2i(ast2expr([[cn2, cn2], cn2]))
-    assert_equal 256, cn2i(ast2expr([[cn2, cn2], [cn2, cn2]]))
+    assert_equal 8, cn2i(ast2expr([cn3, cn2]))
+    assert_equal 64, cn2i(ast2expr([cn2, [cn3, cn2]]))
+    assert_equal 256, cn2i(ast2expr([[cn3, cn2], cn2]))
   end
 
   def test_comb

@@ -103,10 +103,10 @@ class HonestB
         else
           f = lhs.arg2
           x = rhs
-          lhs.arg1.times{ f = f.apply(x) }
-          @type = :A
-          @arg1 = f.arg1
-          @arg2 = f.arg2
+          lhs.arg1.times{ x = f.apply(x) }
+          @type = x.type
+          @arg1 = x.arg1
+          @arg2 = x.arg2
         end
       when :INC
         rhs = rhs.eval if rhs.type != :NUM
