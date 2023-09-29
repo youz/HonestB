@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require "strscan"
-
 class HonestB
 
   class Expr
@@ -129,6 +127,18 @@ class HonestB
         raise "invalid output format (result was not a number): #{self.inspect}"
       end
     end
+
+    def to_s
+      case @type
+      when :A then "[#{@arg1.to_s}, #{@arg2.to_s}]"
+      when :I1, :S1, :K1 then "#{@type}(#{@arg1.to_s})"
+      when :S2 then "S2(#{@arg1.to_a}, #{@arg2.to_s})"
+      when :CN then "CN(#{@arg1})"
+      when :CN1 then "[CN(#{@arg1}), #{@arg2.to_s}]"
+      when :NUM then @arg1.to_s
+      else @type.inspect
+      end
+    end
   end
 
   def initialize(stdin = $stdin, stdout = $stdout)
@@ -198,36 +208,27 @@ class HonestB
     end
   end
 
-  def parse(src)
-    ss = StringScanner.new(src)
+  def parse(input)
     stack = []
-    line = 1
-    lastlf = 0
-    while true
-      unless ss.scan_until(/スロー|クイック|\u2764|\n/)
-        break
-      end
-      case ss.matched
-      when "\n"
-        line += 1
-        lastlf = ss.charpos
-      when "スロー"
-        stack << :S
-      when "クイック"
-        stack << :K
-      when "\u2764"
-        if stack.size < 2
-          col = ss.charpos - lastlf
-          p stack
-          raise "line #{line}: column #{col}: syntax error, unexpected \u2764"
+    line = 0
+    input.each_line{|l|
+      line += 1
+      l.scan(/スロー|クイック|\u2764/).each{|tk|
+        case tk
+        when "スロー" then stack << Expr.new(:S)
+        when "クイック" then stack << Expr.new(:K)
+        when "\u2764" then
+          if stack.size < 2
+            raise SyntaxError.new("line #{line}: unexpected \u2764")
+          end
+          f = stack.pop
+          a = stack.pop
+          stack << f.apply(a)
         end
-        f = stack.pop
-        a = stack.pop
-        stack << [f, a]
-      end
-    end
+      }
+    }
     if stack.size > 1
-      raise "line #{line}: syntax error, unexpected EOF"
+      raise SyntaxError.new("line #{line}: unexpected EOF")
     end
     stack[0]
   end
@@ -239,8 +240,8 @@ class HonestB
     end
   end
 
-  def run(src)
-    expr = ast2expr(parse(src))
+  def run(srcinput)
+    expr = parse(srcinput)
     input = Expr.new(:READ, method(:readc), 0)
     print_list(expr.apply(input))
   end

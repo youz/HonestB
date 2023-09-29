@@ -11,10 +11,10 @@ class TestHonestB < Minitest::Test
   end
 
   def test_parse
-    assert_equal [[:S, :K], :K], @hb.parse("クイッククイックスロー❤❤")
-    assert_equal [:S, [:K, :K]], @hb.parse("クイッククイック❤スロー❤")
+    assert_equal "[[:S, :K], :K]", @hb.parse("クイッククイックスロー❤❤").to_s
+    assert_equal "[:S, [:K, :K]]", @hb.parse("クイッククイック❤スロー❤").to_s
     ["\u2764", "\u2764\ufe0e", "\u2764\ufe0f"].each {|c|
-      assert_equal [:S, :K], @hb.parse("クイックスロー" + c)
+      assert_equal "[:S, :K]", @hb.parse("クイックスロー" + c).to_s
     }
   end
 

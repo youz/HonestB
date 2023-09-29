@@ -9,17 +9,53 @@ class LazyK2HonestB
   end
 
   def read_lazyk
-    begin
-      c = @input.readchar
-    rescue EOFError
-      raise "unexpected EOF"
-    end until c =~ /[`ski]/
-    case c
-    when "`" then [read_lazyk, read_lazyk]
-    when "s" then :S
-    when "k" then :K
-    when "i" then [[:S, :K], :K]
+    expr = read1
+    while e = read1
+      expr = [expr, e]
     end
+    expr
+  end
+
+  def read1
+    stack = []
+    cur = nil
+    while true
+      while true
+        begin
+          c = @input.readchar
+        rescue EOFError
+          c = nil
+          break
+        end
+        if c =~ /[`ski]/ || c.nil?
+          break
+        end
+      end
+
+      case c
+      when nil
+        if stack.empty? && cur.nil?
+          return nil
+        else
+          raise "unexpected EOF"
+        end
+      when "`"
+        stack << cur if cur
+        cur = []
+      when "s" then cur << :S
+      when "k" then cur << :K
+      when "i" then cur << [[:S, :K], :K]
+      end
+      while cur.length == 2
+        if stack.empty?
+          return cur
+        end
+        prev = stack.pop
+        prev << cur
+        cur = prev
+      end
+    end
+    nil
   end
 
   def print1(tk)
@@ -39,13 +75,18 @@ class LazyK2HonestB
   end
 
   def print_hb(expr)
-    case expr
-    in [e1, e2]
-      print_hb(e2)
-      print_hb(e1)
-      print1("\u2764")
-    in :S then print1("スロー")
-    in :K then print1("クイック")
+    stack = [expr]
+    until stack.empty?
+      e = stack.pop
+      case e
+      in :S then print1("スロー")
+      in :K then print1("クイック")
+      in :App then print1("\u2764")
+      in [e1, e2]
+        stack << :App
+        stack << e1
+        stack << e2
+      end
     end
   end
 
