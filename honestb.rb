@@ -21,16 +21,12 @@ class HonestB
     NUM0 = Expr.new(:NUM, 0)
 
     def drop_i1
+      cur = self
       if @type == :I1
-        cur = @arg1
-        while cur.type == :I1
-          cur = cur.arg1
-        end
+        cur = cur.arg1 while cur.type == :I1
         @arg1 = cur if @arg1 != cur
-        cur
-      else
-        self
       end
+      cur
     end
 
     def apply(arg)
