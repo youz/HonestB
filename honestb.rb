@@ -243,12 +243,18 @@ class HonestB
   end
 
   def run(srcinput)
-    expr = parse(srcinput)
+    expr = parse(srcinput.read)
+    if expr.nil?
+      raise "failed loading program from #{srcinput.inspect}"
+    end
     input = Expr.new(:READ, method(:readc), 0)
     print_list(expr.apply(input))
   end
 
-  public :parse, :run
+  def run_file(filepath)
+    File.open(filepath, "r"){|f| run(f) }
+  end
+  public :parse, :run, :run_file
 end
 
 def show_help_and_exit
@@ -261,17 +267,14 @@ if __FILE__ == $0
     if $stdin.tty?
       show_help_and_exit
     else
-      src = $stdin.read
       require "stringio"
-      stdin = StringIO.new("")
+      exit HonestB.new(StringIO.new("")).run($stdin)
     end
   else
     if ARGV[0] == "-h" || ARGV[0] == "--help"
       show_help_and_exit
     else
-      src = File.open(ARGV[0]).read
-      stdin = $stdin
+      exit HonestB.new($stdin).run_file(ARGV[0])
     end
   end
-  exit HonestB.new(stdin).run(src)
 end

@@ -83,7 +83,7 @@ class TestHonestB < Minitest::Test
     stdin = StringIO.new("ご友人\u2764\u2764")
     stdout = StringIO.new
     hb = HonestB.new(stdin, stdout)
-    hb.run("クイッククイックスロー\u2764\u2764")
+    hb.run(StringIO.new("クイッククイックスロー\u2764\u2764"))
     assert_equal "ご友人\u2764\u2764", stdout.string
   end
 end
